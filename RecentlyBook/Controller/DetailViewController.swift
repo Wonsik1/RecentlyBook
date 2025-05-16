@@ -10,61 +10,61 @@ import SnapKit
 
 class DetailViewController: UIViewController {
     
-    private let titleLabel = UILabel()
-    private let cancelButton = UIButton(type: .system)
-    private let putButton = UIButton(type: .system)
-    private let buttonStack = UIStackView()
-    
+    private let detailView = DetailView()
+    private let book: KaKaoBook
+
+    init(book: KaKaoBook) {
+        self.book = book
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func loadView() {
+        self.view = detailView
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .white
-        setupBottomButtons()
+        configureWithBook()
+        setupActions()
     }
-    
-    
-    private func setupBottomButtons() {
-        
-        cancelButton.setTitle("X", for: .normal)
-        cancelButton.backgroundColor = .systemGray5
-        cancelButton.setTitleColor(.black, for: .normal)
-        cancelButton.layer.cornerRadius = 24
-        
-        putButton.setTitle("담기", for: .normal)
-        putButton.backgroundColor = .systemGreen
-        putButton.setTitleColor(.white, for: .normal)
-        putButton.layer.cornerRadius = 24
-        
-        cancelButton.addTarget(self, action: #selector(closeModal), for: .touchUpInside)
-//        putButton.addTarget(self, action: #selector(putBook()), for: .touchUpInside)
-        
-        buttonStack.axis = .horizontal
-        buttonStack.spacing = 12
-        buttonStack.distribution = .fillEqually
-        
-        buttonStack.addArrangedSubview(cancelButton)
-        buttonStack.addArrangedSubview(putButton)
-        view.addSubview(buttonStack)
-        
-        buttonStack.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
-            $0.height.equalTo(48)
-            
-            
+
+    private func configureWithBook() {
+        detailView.titleLabel.text = book.title
+        detailView.authorLabel.text = book.authors.joined(separator: ", ")
+        detailView.priceLabel.text = "\(book.price)원"
+        detailView.contentsLabel.text = book.contents
+
+        if let url = URL(string: book.thumbnail) {
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                if let data = data, let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self.detailView.thumbnailImageView.image = image
+                    }
+                }
+            }.resume()
         }
-        
-        
-        
     }
-    
-    
+
+    private func setupActions() {
+        detailView.closeButton.addTarget(self, action: #selector(closeModal), for: .touchUpInside)
+        detailView.putButton.addTarget(self, action: #selector(putBook), for: .touchUpInside)
+    }
+
     @objc func closeModal() {
         dismiss(animated: true, completion: nil)
     }
-    
+
     @objc func putBook() {
-        
+        let bookEntity = SavedBook(context: CoreDataManager.shared.context)
+        bookEntity.title = book.title
+        bookEntity.authors = book.authors.joined(separator: ", ")
+        bookEntity.price = Int32(book.price)
+        bookEntity.thumbnail = book.thumbnail
+        CoreDataManager.shared.saveContext()
+        dismiss(animated: true, completion: nil)
     }
-    
 }

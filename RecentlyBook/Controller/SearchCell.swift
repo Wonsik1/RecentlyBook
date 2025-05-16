@@ -11,6 +11,7 @@ class SearchCell: UICollectionViewCell {
     
     private let titleLabel = UILabel()
     private let authorLabel = UILabel()
+    private let priceLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -18,6 +19,7 @@ class SearchCell: UICollectionViewCell {
         
         contentView.addSubview(titleLabel)
         contentView.addSubview(authorLabel)
+        contentView.addSubview(priceLabel)
         
         authorLabel.font = .systemFont(ofSize: 14)
         authorLabel.textColor = .darkGray
@@ -41,6 +43,7 @@ class SearchCell: UICollectionViewCell {
     func configure(with book: KaKaoBook) {
         titleLabel.text = book.title
         authorLabel.text = book.authors.joined(separator: ", ")
+        priceLabel.text = "\(book.price)원"
     }
     
 }
