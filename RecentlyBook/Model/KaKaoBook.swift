@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct KaKaoBook: Decodable {
+struct KaKaoBook: Codable {
     let title: String
     let authors: [String]
     let price: Int

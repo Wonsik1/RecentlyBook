@@ -33,6 +33,12 @@ class SearchCell: UICollectionViewCell {
             $0.top.equalTo(titleLabel.snp.bottom).offset(4)
             $0.leading.trailing.equalToSuperview().inset(8)
         }
+        
+        priceLabel.snp.makeConstraints {
+            $0.top.equalTo(authorLabel.snp.bottom).offset(4)
+            $0.leading.trailing.equalToSuperview().inset(8)
+            $0.bottom.equalToSuperview().inset(8)
+        }
     }
     
     

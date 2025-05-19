@@ -8,7 +8,13 @@
 import UIKit
 import SnapKit
 
+protocol DetailViewControllerDelegate: AnyObject {
+    func didDismissDetail()
+}
+
 class DetailViewController: UIViewController {
+    
+    weak var delegate: DetailViewControllerDelegate?
     
     private let detailView = DetailView()
     private let book: KaKaoBook
@@ -28,11 +34,12 @@ class DetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        RecentlyViewedManager.shared.add(book)
         configureWithBook()
         setupActions()
     }
 
-    private func configureWithBook() {
+    private func configureWithBook() { // UI에 책 정보 표시
         detailView.titleLabel.text = book.title
         detailView.authorLabel.text = book.authors.joined(separator: ", ")
         detailView.priceLabel.text = "\(book.price)원"
@@ -54,17 +61,23 @@ class DetailViewController: UIViewController {
         detailView.putButton.addTarget(self, action: #selector(putBook), for: .touchUpInside)
     }
 
-    @objc func closeModal() {
-        dismiss(animated: true, completion: nil)
-    }
-
-    @objc func putBook() {
+    @objc func putBook() { // 책을 CoreData에 저장
         let bookEntity = SavedBook(context: CoreDataManager.shared.context)
         bookEntity.title = book.title
         bookEntity.authors = book.authors.joined(separator: ", ")
         bookEntity.price = Int32(book.price)
         bookEntity.thumbnail = book.thumbnail
         CoreDataManager.shared.saveContext()
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: true) {
+            self.delegate?.didDismissDetail()
+        }
+    
     }
+    
+    @objc func closeModal() {
+            dismiss(animated: true) {
+                self.delegate?.didDismissDetail()
+                
+            }
+        }
 }

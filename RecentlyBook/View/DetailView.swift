@@ -58,7 +58,7 @@ class DetailView: UIView {
         closeButton.layer.cornerRadius = 24
         closeButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-        putButton.setTitle("당기", for: .normal)
+        putButton.setTitle("담기", for: .normal)
         putButton.backgroundColor = .systemGreen
         putButton.setTitleColor(.white, for: .normal)
         putButton.layer.cornerRadius = 24
